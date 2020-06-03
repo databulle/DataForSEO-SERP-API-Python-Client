@@ -77,7 +77,14 @@ Simply run:
 
     $ python tasks_ready.py  
 
-
+Note that the API will only show you 1000 available results at most, but there might be more not shown.  
 
 ### 3. Get results
+
+Once you've posted your requests, it usually takes only a few instants for the API to process.  
+To get the results, run:  
+
+    $ python tasks_get.py  
+
+The script will request the API to check for available results, then download the data for each done task and repeat while there are available results.  
 

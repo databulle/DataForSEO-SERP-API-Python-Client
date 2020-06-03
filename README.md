@@ -88,3 +88,6 @@ To get the results, run:
 
 The script will request the API to check for available results, then download the data for each done task and repeat while there are available results.  
 
+## Contributing
+
+If you wish to contribute to this repository or to report an issue, please do this [on GitLab](https://gitlab.com/databulle/dataforseo-serp-api-python-client).  

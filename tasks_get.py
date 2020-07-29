@@ -10,6 +10,7 @@ import argparse
 import time
 import datetime
 from client import RestClient
+import json
 
 
 if __name__ == '__main__': 
@@ -28,7 +29,7 @@ if __name__ == '__main__':
     password = conf['general']['password']
 
     # Output headers
-    fields=['task_id','status','request','request_type','domain','location_code','language_code','timestamp','results_count','rank_group','rank_absolute','result_type','title','description','url','breadcrumb']
+    fields=['task_id','status','request','request_type','domain','location_code','language_code','timestamp','results_count','spell','item_types','rank_group','rank_absolute','item_type','title','description','url','breadcrumb']
     # Output name
     timestr = time.strftime("%Y%m%d-%H%M%S")
     tag = args.output + "-" + timestr
@@ -58,6 +59,8 @@ if __name__ == '__main__':
                             results.append(client.get(resultTaskInfo['endpoint_regular']))                
 
             for result in results:
+                print(result)
+
                 for task in result["tasks"]:
                     task_id = task['id']
                     status = task['status_message']
@@ -69,6 +72,8 @@ if __name__ == '__main__':
                         language_code = kw["language_code"]
                         timestamp = kw["datetime"]
                         results_count = kw["se_results_count"]
+                        spell = json.dumps(kw["spell"])
+                        item_types = json.dumps(kw["item_types"])
 
                         for item in kw["items"]:
                             row = dict()
@@ -80,8 +85,10 @@ if __name__ == '__main__':
                             row["location_code"] = location_code
                             row["language_code"] = language_code
                             row["timestamp"] = timestamp
+                            row["spell"] = spell
+                            row["item_types"] = item_types
                             row["results_count"] = results_count
-                            row["result_type"] = item["type"]
+                            row["item_type"] = item["type"]
                             row["rank_group"] = item["rank_group"]
                             row["rank_absolute"] = item["rank_absolute"]
                             row["title"] = item["title"]
@@ -93,6 +100,7 @@ if __name__ == '__main__':
                                 writer = csv.DictWriter(file, fieldnames=fields, delimiter=";")
                                 writer.writerow(row)
                                 file.close()
+                            exit(0)
 
             print("Batch done.")
             time.sleep(args.delay)

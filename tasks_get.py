@@ -59,8 +59,6 @@ if __name__ == '__main__':
                             results.append(client.get(resultTaskInfo['endpoint_regular']))                
 
             for result in results:
-                print(result)
-
                 for task in result["tasks"]:
                     task_id = task['id']
                     status = task['status_message']
@@ -100,7 +98,6 @@ if __name__ == '__main__':
                                 writer = csv.DictWriter(file, fieldnames=fields, delimiter=";")
                                 writer.writerow(row)
                                 file.close()
-                            exit(0)
 
             print("Batch done.")
             time.sleep(args.delay)

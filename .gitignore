@@ -7,7 +7,7 @@
 !requirements.txt
 *.json
 !*.sample.json
-
+*.gz
 
 # General
 .DS_Store

@@ -17,8 +17,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', default="config.ini",
             type=str, help='Global config file (default: "config.ini")')
-    parser.add_argument('--output', default="keyword-results",
-            type=str, help='Output basename (default: "keyword-results")')
+    parser.add_argument('--output', default="serps-results",
+            type=str, help='Output basename (default: "serps-results")')
+    parser.add_argument('--advanced', action='store_true', default=False,
+            help='Get advanced details (default: False).')
     parser.add_argument('--delay', default=10,
             type=float, help='Delay in seconds between batches of requests (default: 10)')
     args = parser.parse_args()
@@ -30,6 +32,8 @@ if __name__ == '__main__':
 
     # Output headers
     fields=['task_id','status','request','request_type','domain','location_code','language_code','timestamp','results_count','spell','item_types','rank_group','rank_absolute','item_type','title','description','url','breadcrumb']
+    if args.advanced:
+        fields.extend(['is_image','is_video','is_featured_snippet','is_malicious','is_web_story','amp_version','rating','sitelinks','faq','items','pixels_from_top'])
     # Output name
     timestr = time.strftime("%Y%m%d-%H%M%S")
     tag = args.output + "-" + timestr
@@ -55,8 +59,8 @@ if __name__ == '__main__':
             for task in response['tasks']:
                 if (task['result'] and (len(task['result']) > 0)):
                     for resultTaskInfo in task['result']:
-                        if(resultTaskInfo['endpoint_regular']):
-                            results.append(client.get(resultTaskInfo['endpoint_regular']))                
+                        if(resultTaskInfo['endpoint_advanced']):
+                            results.append(client.get(resultTaskInfo['endpoint_advanced']))                
 
             for result in results:
                 for task in result["tasks"]:
@@ -89,10 +93,38 @@ if __name__ == '__main__':
                             row["item_type"] = item["type"]
                             row["rank_group"] = item["rank_group"]
                             row["rank_absolute"] = item["rank_absolute"]
-                            row["title"] = item["title"]
-                            row["description"] = item["description"]
-                            row["url"] = item["url"]
-                            row["breadcrumb"] = item["breadcrumb"]
+                            if "title" in item.keys():
+                                row["title"] = item["title"]
+                            if "description" in item.keys():
+                                row["description"] = item["description"]
+                            if "url" in item.keys():
+                                row["url"] = item["url"]
+                            if "breadcrumb" in item.keys():
+                                row["breadcrumb"] = item["breadcrumb"]
+
+                            if args.advanced:
+                                if "is_image" in item.keys():
+                                    row["is_image"] = item["is_image"]
+                                if "is_video" in item.keys():
+                                    row["is_video"] = item["is_video"]
+                                if "is_featured_snippet" in item.keys():
+                                    row["is_featured_snippet"] = item["is_featured_snippet"]
+                                if "is_malicious" in item.keys():
+                                    row["is_malicious"] = item["is_malicious"]
+                                if "is_web_story" in item.keys():
+                                    row["is_web_story"] = item["is_web_story"]
+                                if "amp_version" in item.keys():
+                                    row["amp_version"] = item["amp_version"]
+                                if "rating" in item.keys():
+                                    row["rating"] = json.dumps(item["rating"])
+                                if "links" in item.keys():
+                                    row["sitelinks"] = json.dumps(item["links"])
+                                if "faq" in item.keys():
+                                    row["faq"] = json.dumps(item["faq"])
+                                if "items" in item.keys():
+                                    row["items"] = json.dumps(item["items"])
+                                if "rectangle" in item.keys():
+                                    row["pixels_from_top"] = item["rectangle"]["y"]
 
                             with open(filename,'a',newline='') as file:
                                 writer = csv.DictWriter(file, fieldnames=fields, delimiter=";")

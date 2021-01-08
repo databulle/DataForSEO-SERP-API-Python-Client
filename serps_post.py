@@ -28,8 +28,8 @@ if __name__ == '__main__':
             type=str, help='Global config file (default: "config.ini")')
     parser.add_argument('--input', required=True,
             type=str, help='List of keywords to request')
-    parser.add_argument('--output', default="keyword-requests",
-            type=str, help='Output basename (default: "keyword-requests")')
+    parser.add_argument('--output', default="serps-tasks",
+            type=str, help='Output basename (default: "serps-tasks")')
     parser.add_argument('--language_code', default="fr",
             type=str, help='Language code for requests (default: "fr")')
     parser.add_argument('--location_code', default=2250,
@@ -38,6 +38,8 @@ if __name__ == '__main__':
             type=int, help='Number of results (default: 10)')
     parser.add_argument('--device', choices=['desktop','mobile'], default="desktop",
             help='Device type (default:"desktop")')
+    parser.add_argument('--pixels', action='store_true', default=False,
+            help='Get pixel rankings (default: False). This will double requests cost. Remember to use `--advanced` option when getting results.')
     parser.add_argument('--priority', choices=['high','low'], default='low',
             help='Priority queue (default: "low")')
     parser.add_argument('--batch', default=100,
@@ -75,7 +77,7 @@ if __name__ == '__main__':
 
     # Send requests
     with open(filename,'w',newline='') as file:
-        writer = csv.DictWriter(file, fieldnames=fields,delimiter=";")
+        writer = csv.DictWriter(file, fieldnames=fields,delimiter=args.sep)
         writer.writeheader()
 
         client = RestClient(user, password)
@@ -96,6 +98,7 @@ if __name__ == '__main__':
                     depth=args.nb_results,
                     device=args.device,
                     tag=tag,
+                    calculate_rectangles=args.pixels,
                 )
 
             response = client.post("/v3/serp/google/organic/task_post", post_data)
@@ -115,3 +118,4 @@ if __name__ == '__main__':
             j += args.batch
             time.sleep(args.delay)
 
+        file.close()

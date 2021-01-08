@@ -1,14 +1,11 @@
 ####
-## DATAFORSEO SERPS API
+## DATAFORSEO GOOGLE KEYWORDS API
 ##
-## Shows number of tasks ready for download
+## Shows number of tasks ready for download.
 ####
 
-import csv
 import configparser
 import argparse
-import time
-import datetime
 from client import RestClient
 
 
@@ -25,7 +22,7 @@ if __name__ == '__main__':
 
     client = RestClient(user,password)
 
-    response = client.get("/v3/serp/google/organic/tasks_ready")
+    response = client.get("/v3/keywords_data/google/search_volume/tasks_ready")
     if response["status_code"] == 20000:
         tasks_available = response["tasks"][0]["result_count"]
         print("{} tasks available".format(tasks_available))

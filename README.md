@@ -97,6 +97,7 @@ Available options:
 - `config`: configuration file to use (default: `config.ini`)  
 - `output`: output basename for the results (default: `serps-results`)  
 - `advanced`: get advanced details, such as presence of image, video, ratings, sitelinks, ... or position of the result in pixels (default: `False`).  
+- `knowledge_graph`: extract specific content from KG panel. This needs the `advanced` mode to be activated. It will concentrate on locations and extract subtitle, address and phone number. Note that these infos are available in the `items` json field when `advanced` is activated, but less easy to process.  
 - `delay`: delay in seconds between batches of requests (default: `10`)  
 
 

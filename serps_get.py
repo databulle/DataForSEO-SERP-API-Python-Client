@@ -20,10 +20,16 @@ if __name__ == '__main__':
     parser.add_argument('--output', default="serps-results",
             type=str, help='Output basename (default: "serps-results")')
     parser.add_argument('--advanced', action='store_true', default=False,
-            help='Get advanced details (default: False).')
+            help='Get advanced details (default: False)')
+    parser.add_argument('--knowledge_graph', action='store_true', default=False,
+            help='Specific KG content scrap - needs Advanced (default: False)')
     parser.add_argument('--delay', default=10,
             type=float, help='Delay in seconds between batches of requests (default: 10)')
     args = parser.parse_args()
+
+    # Check if --advanced with --knowledge_graph
+    if args.knowledge_graph and not args.advanced:
+        parser.error("Advanced mode (`--advanced`) must be activated to use the `--knowledge_graph` argument.")
 
     conf = configparser.ConfigParser()
     conf.read(args.config)
@@ -34,6 +40,9 @@ if __name__ == '__main__':
     fields=['task_id','status','request','request_type','domain','location_code','language_code','timestamp','results_count','spell','item_types','rank_group','rank_absolute','item_type','title','description','url','breadcrumb']
     if args.advanced:
         fields.extend(['is_image','is_video','is_featured_snippet','is_malicious','is_web_story','amp_version','rating','sitelinks','faq','items','pixels_from_top'])
+    if args.knowledge_graph:
+        fields.extend(['sub_title','address','phone'])
+
     # Output name
     timestr = time.strftime("%Y%m%d-%H%M%S")
     tag = args.output + "-" + timestr
@@ -125,6 +134,17 @@ if __name__ == '__main__':
                                     row["items"] = json.dumps(item["items"])
                                 if "rectangle" in item.keys():
                                     row["pixels_from_top"] = item["rectangle"]["y"]
+
+                                if (args.knowledge_graph) and (item["type"] == "knowledge_graph"):
+                                    if "sub_title" in item.keys():
+                                        row["sub_title"] = item["sub_title"]
+                                    for i in item["items"]:
+                                        if "data_attrid" in i.keys():
+                                            if "address" in str(i["data_attrid"]):
+                                                row["address"] = i["text"]
+                                            elif "phone" in str(i["data_attrid"]):
+                                                row["phone"] = i["text"]
+
 
                             with open(filename,'a',newline='') as file:
                                 writer = csv.DictWriter(file, fieldnames=fields, delimiter=";")
